@@ -2,6 +2,7 @@ file(REMOVE_RECURSE
   "CMakeFiles/Test.dir/main.cpp.obj"
   "CMakeFiles/Test.dir/Node.cpp.obj"
   "CMakeFiles/Test.dir/Tree.cpp.obj"
+  "CMakeFiles/Test.dir/DK_Tree.cpp.obj"
   "Test.pdb"
   "Test.exe"
   "Test.exe.manifest"

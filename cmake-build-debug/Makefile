@@ -122,6 +122,33 @@ Test/fast:
 	$(MAKE) -f CMakeFiles\Test.dir\build.make CMakeFiles/Test.dir/build
 .PHONY : Test/fast
 
+DK_Tree.obj: DK_Tree.cpp.obj
+
+.PHONY : DK_Tree.obj
+
+# target to build an object file
+DK_Tree.cpp.obj:
+	$(MAKE) -f CMakeFiles\Test.dir\build.make CMakeFiles/Test.dir/DK_Tree.cpp.obj
+.PHONY : DK_Tree.cpp.obj
+
+DK_Tree.i: DK_Tree.cpp.i
+
+.PHONY : DK_Tree.i
+
+# target to preprocess a source file
+DK_Tree.cpp.i:
+	$(MAKE) -f CMakeFiles\Test.dir\build.make CMakeFiles/Test.dir/DK_Tree.cpp.i
+.PHONY : DK_Tree.cpp.i
+
+DK_Tree.s: DK_Tree.cpp.s
+
+.PHONY : DK_Tree.s
+
+# target to generate assembly for a file
+DK_Tree.cpp.s:
+	$(MAKE) -f CMakeFiles\Test.dir\build.make CMakeFiles/Test.dir/DK_Tree.cpp.s
+.PHONY : DK_Tree.cpp.s
+
 Node.obj: Node.cpp.obj
 
 .PHONY : Node.obj
@@ -212,6 +239,9 @@ help:
 	@echo ... rebuild_cache
 	@echo ... Test
 	@echo ... edit_cache
+	@echo ... DK_Tree.obj
+	@echo ... DK_Tree.i
+	@echo ... DK_Tree.s
 	@echo ... Node.obj
 	@echo ... Node.i
 	@echo ... Node.s

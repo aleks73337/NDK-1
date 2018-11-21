@@ -4,6 +4,7 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
+  "C:/Users/Alex/CLionProjects/Test/DK_Tree.cpp" "C:/Users/Alex/CLionProjects/Test/cmake-build-debug/CMakeFiles/Test.dir/DK_Tree.cpp.obj"
   "C:/Users/Alex/CLionProjects/Test/Node.cpp" "C:/Users/Alex/CLionProjects/Test/cmake-build-debug/CMakeFiles/Test.dir/Node.cpp.obj"
   "C:/Users/Alex/CLionProjects/Test/Tree.cpp" "C:/Users/Alex/CLionProjects/Test/cmake-build-debug/CMakeFiles/Test.dir/Tree.cpp.obj"
   "C:/Users/Alex/CLionProjects/Test/main.cpp" "C:/Users/Alex/CLionProjects/Test/cmake-build-debug/CMakeFiles/Test.dir/main.cpp.obj"

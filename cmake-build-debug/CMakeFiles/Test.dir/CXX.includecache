@@ -17,8 +17,14 @@ string
 -
 iostream
 -
+vector
+-
 stack
 C:/Users/Alex/CLionProjects/Test/stack
+map
+-
+vector
+-
 
 C:/Users/Alex/CLionProjects/Test/Tree.h
 Node.h

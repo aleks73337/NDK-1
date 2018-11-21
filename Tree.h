@@ -15,12 +15,12 @@ public:
     Tree();
     ~Tree();
     Node* top;
-    std::list<Node*> nodes_ptr;
     bool create_tree(std::string exp);
     void print_tree();
+    static std::list<Node*> nodes_ptr;
 private:
     int  nBrack;
-    bool reverce(std::string exp, Node* parent);
+    bool reverce(std::string exp, Node* parent, Node* back_node);
 };
 
 

@@ -3,8 +3,8 @@
 #include <regex>
 
 int main() {
-    Tree* tree = new Tree();
-    std::string exp = "a|bc.dr*";
+    auto tree = new Tree();
+    std::string exp = "ajsnd(d|s)*c|a(nsdf|sd)*";
     tree->create_tree(exp);
     tree->print_tree();
     delete tree;
