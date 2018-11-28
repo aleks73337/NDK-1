@@ -7,6 +7,8 @@
 #include <iostream>
 #include <vector>
 #include "stack"
+#include "set"
+#include "tuple"
 
 Tree::Tree() : top(new Node), nBrack(0)
 {
@@ -21,6 +23,7 @@ Tree::~Tree()
 }
 
 std::list<Node*> Tree::nodes_ptr;
+int Tree::max_id = 0;
 
 void pre_pars(std::string &exp)
 {
@@ -50,7 +53,7 @@ bool Tree::reverce(std::string exp, Node* top, Node* back_node = nullptr)
             nBrack--;
         if (exp[i] == '|' && nBrack == 0)
         {
-            top->set_value("");
+            top->set_value("E");
             top->id = ++id;
             Node* l_node = new Node(exp.substr(0, i));
             top->add_left(l_node);
@@ -96,17 +99,20 @@ bool Tree::reverce(std::string exp, Node* top, Node* back_node = nullptr)
                 return true;
             } else if (exp[i] == '*') {
                 top->id = ++id;
-                top->set_value("");
-                Node *l_node = new Node("");
+                top->set_value("E");
+                Node *l_node = new Node("E");
                 top->add_left(l_node);
                 nodes_ptr.push_back(l_node);
                 reverce(exp.substr(0, i), l_node, top);
 
-                Node *r_node = new Node(exp.substr(i + 1, exp.length()));
+				exp = exp.substr(i + 1, exp.length());
+				if (exp.size() == 0)
+					exp = "E";
+                Node *r_node = new Node(exp);
                 top->add_right(r_node);
                 nodes_ptr.push_back(r_node);
-
                 reverce(r_node->get_value(), r_node);
+
                 return true;
             }
         }
@@ -117,8 +123,14 @@ bool Tree::reverce(std::string exp, Node* top, Node* back_node = nullptr)
         top->id = ++id;
         top->set_value(exp);
     }
+    if (exp.empty())
+    {
+        top->id = ++id;
+    }
     if (back_node != nullptr)
         top->add_left(back_node);
+    if (top->id > max_id)
+        max_id = top->id;
     return true;
 }
 
@@ -169,26 +181,171 @@ void Tree::print_tree()
 bool Tree::create_tree(std::string exp)
 {
     pre_pars(exp);
-    if (!reverce(exp, top))
+    Node* r_top = new Node("E");
+    top->add_right(r_top);
+    top->set_value("E");
+    top->id = 0;
+    if (!reverce(exp, r_top))
     {
         std::cout << "Wrong data";
     };
     return true;
 }
 
-#include <map>
-#include <vector>
-std::map<int, std::vector<Node*>> dka_tree;
-
-void make_dka(Node* top)
+void Tree::add_vertex(Node *top, Node* parent)
 {
-    static int id = 0;
-    std::vector<Node*> vec;
-    if (top->get_l_node()->get_value() == top->get_r_node()->get_value())
+    static std::set<std::pair<int,int>> checked;
+    if (checked.find(std::pair<int,int>(parent->id,top->id)) != checked.end())
+        return;
+    if (!top->get_value().empty())
     {
-        vec.push_back(top->get_l_node());
-        vec.push_back(top->get_r_node());
-        dka_tree.insert(std::pair<int,std::vector<Node*>>(id,vec));
+        nodes_matrix[parent->id][top->id] = top->get_value()[0];
+        values.insert(std::pair<char, bool>(top->get_value()[0], true));
+        checked.insert(std::pair<int,int>(parent->id,top->id));
+    }
+    else
+    {
+        nodes_matrix[parent->id][top->id] = ' ';
+        checked.insert(std::pair<int,int>(parent->id,top->id));
+    }
+    Node* l_node = top->get_l_node();
+    if (l_node != nullptr)
+    {
+        add_vertex(l_node, top);
+    }
+    Node* r_node = top->get_r_node();
+    if (r_node != nullptr)
+    {
+        add_vertex(r_node, top);
+    }
+}
+
+void Tree::create_node_matrix()
+{
+    nodes_matrix = new char* [max_id];
+    for (int i = 0; i<=max_id; i++)
+    {
+        nodes_matrix[i] = new char [max_id];
+        for (int j=0; j<=max_id; j++)
+            nodes_matrix[i][j] = ' ';
     }
 
+    add_vertex(top, top);
+    std::cout << "  ";
+    for (int i=0; i<=max_id; i++)
+        std::cout << i << " ";
+    std::cout << std::endl;
+    for (int i = 0; i<= max_id; i++)
+    {
+        std::cout << i << " ";
+        for (int j =0; j<=max_id; j++)
+        {
+            char val = nodes_matrix[i][j];
+            std::cout << val << " ";
+        }
+        std::cout << std::endl;
+    }
+}
+
+std::vector<int> Tree::move(char& symbol, int& start)
+{
+    std::vector<int> ways;
+    for (int i=0; i <= max_id; i++)
+    {
+		if (nodes_matrix[start][i] == symbol && nodes_matrix[start][i] != 'E')
+            ways.push_back(i);
+    }
+    return ways;
+}
+
+std::vector<int> Tree::e_closure(std::vector<int>& starts)
+{
+    std::vector<int> ways = starts;
+	int size = ways.size();
+    for (int j = 0; j < size; j++)
+    {
+        for (int i = 0; i <= max_id; i++)
+        {
+			if (nodes_matrix[ways[j]][i] == 'E')
+			{
+				ways.push_back(i);
+				size = ways.size();
+			}
+        }
+    }
+    return ways;
+}
+
+void Tree::make_dka()
+{
+    int id = 0;
+	std::vector<int> start = { 0 };
+	dka_nodes.insert(std::pair< std::vector< int >, int >(start, id++));
+	accord.insert(std::pair< int, std::pair < int, char > >(0, std::pair< int, char >(0,'E')));
+	std::map<std::vector<int>, int>::iterator dka_end = dka_nodes.end();
+	for (auto dka_it = dka_nodes.begin(); dka_it != dka_end; dka_it++)
+	{
+		for (auto node : dka_it->first)
+		{
+			for (auto pair : values) 
+			{
+				char letter_ = pair.first;
+				std::vector<int> moves = move(letter_, node);
+				std::vector<int> e_closures = e_closure(moves);
+				if (dka_nodes.find(e_closures) == dka_nodes.end() && e_closures.size() != 0)
+				{
+					if (moves.size() != 0)
+						accord.insert(std::pair<int, std::pair<int, char>>(dka_it->second, std::pair<int, char>(id, letter_)));
+					else
+						accord.insert(std::pair<int, std::pair<int, char>>(dka_it->second, std::pair<int, char>(id, 'E')));
+					dka_nodes.insert(std::pair<std::vector<int>, int>(e_closures, id));
+					id++;
+				}
+				else if (e_closures.size() != 0 && dka_nodes.find(e_closures) != dka_nodes.end())
+				{
+					int prev_id = dka_nodes.find(e_closures)->second;
+					if (moves.size() != 0)
+						accord.insert(std::pair<int, std::pair<int, char>>(dka_it->second, std::pair<int, char>(prev_id, letter_)));
+					else
+						accord.insert(std::pair<int, std::pair<int, char>>(dka_it->second, std::pair<int, char>(prev_id, 'E')));
+				}
+			}
+		}
+    }
+
+	for (std::map<std::vector<int>, int>::iterator it = dka_nodes.begin(); it != dka_nodes.end(); it++)
+	{
+		std::cout << "id = " << it->second;
+		for (int i = 0; i < it->first.size(); i++)
+			 std::cout << "|| values = " << it->first[i];
+		std::cout << std::endl;
+	}
+
+	for (std::multimap<int, std::pair<int, char>>::iterator it = accord.begin(); it != accord.end(); it++)
+	{
+		int from = it->first;
+		int to = it->second.first;
+		char token = it->second.second;
+
+		std::cout << "From: " << from << " To: " << to << " Token: " << token << std::endl;
+	}
+}
+
+bool Tree::is_consists(std::string str, int pos)
+{
+	if (str.size() == 0)
+		return true;
+	char token = str[0];
+	str = str.substr(1, str.size() - 1);
+	std::pair<std::multimap<int, std::pair<int, char>>::iterator, std::multimap<int, std::pair<int, char>>::iterator> range = accord.equal_range(pos);
+	for (std::multimap<int, std::pair<int, char>>::iterator it = range.first; it != range.second; it++)
+	{
+		if (it->second.second == token)
+		{
+			if (is_consists(str, it->second.first))
+				return true;
+		}
+
+	}
+	return false;
 }
